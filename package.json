@@ -1,0 +1,32 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "codegen": "npx graphql-codegen"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^4.0.1",
+    "@graphql-codegen/client-preset": "^4.0.0",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^18",
+    "nuxt": "^3.5.2",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.7.15",
+    "@mdi/font": "^7.2.96",
+    "firebase": "^9.22.2",
+    "graphql": "^16.6.0",
+    "graphql-tag": "^2.12.6",
+    "graphql-ws": "^5.13.1",
+    "lodash": "^4.17.21",
+    "sass": "^1.62.1",
+    "vite-plugin-vuetify": "^1.0.2",
+    "vuetify": "^3.3.1"
+  }
+}
