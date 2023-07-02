@@ -13,8 +13,8 @@ export const GET_USER = gql`
 `;
 
 export const GET_WORKSPACE_LIST = gql`
-  query WorkspaceList($skip: Int, $take: Int) {
-    workspaceList(skip: $skip, take: $take) {
+  query WorkspaceList($skip: Int, $take: Int, $excludeIds: [String!]) {
+    workspaceList(skip: $skip, take: $take, excludeIds: $excludeIds) {
       hasMore
       workspaces {
         id
@@ -34,8 +34,8 @@ export const IS_WORKSPACE_SLUG_AVAILABLE = gql`
 `;
 
 export const GET_WORKSPACE = gql`
-  query GetWorkspace($workspaceId: String!) {
-    workspace(id: $workspaceId) {
+  query GetWorkspace($id: String!) {
+    workspace(id: $id) {
       color
       icon
       id

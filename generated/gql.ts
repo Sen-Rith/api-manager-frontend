@@ -15,10 +15,14 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "\n  mutation UpdateUser($input: UpdateUserInput!) {\n    updateUser(input: $input) {\n      id\n      email\n      theme\n      displayName\n      photoURL\n    }\n  }\n": types.UpdateUserDocument,
     "\n  mutation CreateWorkspace($input: CreateWorkspaceInput!) {\n    createWorkspace(input: $input) {\n      color\n      icon\n      id\n      name\n      slug\n    }\n  }\n": types.CreateWorkspaceDocument,
+    "\n  mutation UpdateWorkspace($input: UpdateWorkspaceInput!) {\n    updateWorkspace(input: $input) {\n      color\n      icon\n      id\n      name\n      slug\n    }\n  }\n": types.UpdateWorkspaceDocument,
+    "\n  mutation RemoveWorkspace($id: String!) {\n    removeWorkspace(id: $id) {\n      id\n    }\n  }\n": types.RemoveWorkspaceDocument,
     "\n  query User {\n    user {\n      id\n      email\n      theme\n      displayName\n      photoURL\n    }\n  }\n": types.UserDocument,
-    "\n  query WorkspaceList($skip: Int, $take: Int) {\n    workspaceList(skip: $skip, take: $take) {\n      hasMore\n      workspaces {\n        id\n        name\n        icon\n        color\n        slug\n      }\n    }\n  }\n": types.WorkspaceListDocument,
+    "\n  query WorkspaceList($skip: Int, $take: Int, $excludeIds: [String!]) {\n    workspaceList(skip: $skip, take: $take, excludeIds: $excludeIds) {\n      hasMore\n      workspaces {\n        id\n        name\n        icon\n        color\n        slug\n      }\n    }\n  }\n": types.WorkspaceListDocument,
     "\n  query isWorkspaceSlugAvailable($slug: String!) {\n    isWorkspaceSlugAvailable(slug: $slug)\n  }\n": types.IsWorkspaceSlugAvailableDocument,
+    "\n  query GetWorkspace($id: String!) {\n    workspace(id: $id) {\n      color\n      icon\n      id\n      name\n      slug\n    }\n  }\n": types.GetWorkspaceDocument,
     "\n  subscription SubscribeToUser {\n    subscribeToUser {\n      mutation\n      user {\n        id\n        email\n        theme\n        displayName\n        photoURL\n      }\n    }\n  }\n": types.SubscribeToUserDocument,
+    "\n  subscription SubscribeToWorkspace($id: String!) {\n    subscribeToWorkspace(id: $id) {\n      mutation\n      workspace {\n        color\n        icon\n        id\n        name\n        slug\n      }\n    }\n  }\n": types.SubscribeToWorkspaceDocument,
 };
 
 /**
@@ -46,11 +50,19 @@ export function gql(source: "\n  mutation CreateWorkspace($input: CreateWorkspac
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation UpdateWorkspace($input: UpdateWorkspaceInput!) {\n    updateWorkspace(input: $input) {\n      color\n      icon\n      id\n      name\n      slug\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateWorkspace($input: UpdateWorkspaceInput!) {\n    updateWorkspace(input: $input) {\n      color\n      icon\n      id\n      name\n      slug\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation RemoveWorkspace($id: String!) {\n    removeWorkspace(id: $id) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation RemoveWorkspace($id: String!) {\n    removeWorkspace(id: $id) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query User {\n    user {\n      id\n      email\n      theme\n      displayName\n      photoURL\n    }\n  }\n"): (typeof documents)["\n  query User {\n    user {\n      id\n      email\n      theme\n      displayName\n      photoURL\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query WorkspaceList($skip: Int, $take: Int) {\n    workspaceList(skip: $skip, take: $take) {\n      hasMore\n      workspaces {\n        id\n        name\n        icon\n        color\n        slug\n      }\n    }\n  }\n"): (typeof documents)["\n  query WorkspaceList($skip: Int, $take: Int) {\n    workspaceList(skip: $skip, take: $take) {\n      hasMore\n      workspaces {\n        id\n        name\n        icon\n        color\n        slug\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query WorkspaceList($skip: Int, $take: Int, $excludeIds: [String!]) {\n    workspaceList(skip: $skip, take: $take, excludeIds: $excludeIds) {\n      hasMore\n      workspaces {\n        id\n        name\n        icon\n        color\n        slug\n      }\n    }\n  }\n"): (typeof documents)["\n  query WorkspaceList($skip: Int, $take: Int, $excludeIds: [String!]) {\n    workspaceList(skip: $skip, take: $take, excludeIds: $excludeIds) {\n      hasMore\n      workspaces {\n        id\n        name\n        icon\n        color\n        slug\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -58,7 +70,15 @@ export function gql(source: "\n  query isWorkspaceSlugAvailable($slug: String!) 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query GetWorkspace($id: String!) {\n    workspace(id: $id) {\n      color\n      icon\n      id\n      name\n      slug\n    }\n  }\n"): (typeof documents)["\n  query GetWorkspace($id: String!) {\n    workspace(id: $id) {\n      color\n      icon\n      id\n      name\n      slug\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  subscription SubscribeToUser {\n    subscribeToUser {\n      mutation\n      user {\n        id\n        email\n        theme\n        displayName\n        photoURL\n      }\n    }\n  }\n"): (typeof documents)["\n  subscription SubscribeToUser {\n    subscribeToUser {\n      mutation\n      user {\n        id\n        email\n        theme\n        displayName\n        photoURL\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  subscription SubscribeToWorkspace($id: String!) {\n    subscribeToWorkspace(id: $id) {\n      mutation\n      workspace {\n        color\n        icon\n        id\n        name\n        slug\n      }\n    }\n  }\n"): (typeof documents)["\n  subscription SubscribeToWorkspace($id: String!) {\n    subscribeToWorkspace(id: $id) {\n      mutation\n      workspace {\n        color\n        icon\n        id\n        name\n        slug\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

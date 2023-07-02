@@ -23,3 +23,23 @@ export const CREATE_WORKSPACE = gql`
     }
   }
 `;
+
+export const UPDATE_WORKSPACE = gql`
+  mutation UpdateWorkspace($input: UpdateWorkspaceInput!) {
+    updateWorkspace(input: $input) {
+      color
+      icon
+      id
+      name
+      slug
+    }
+  }
+`;
+
+export const REMOVE_WORKSPACE = gql`
+  mutation RemoveWorkspace($id: String!) {
+    removeWorkspace(id: $id) {
+      id
+    }
+  }
+`;

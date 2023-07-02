@@ -2,14 +2,23 @@
   <div class="h-100">
     <v-app-bar>
       <template v-slot:prepend>
-        <nuxt-link to="/">
+        <nuxt-link v-if="!user || !isWorkspaceRoute" to="/">
           <v-avatar color="primary" variant="outlined">
             <v-icon size="small" icon="mdi-webhook"></v-icon>
           </v-avatar>
         </nuxt-link>
+
+        <v-btn
+          v-else
+          :icon="navigation ? 'mdi-menu-open' : 'mdi-menu'"
+          size="small"
+          @click.stop="navigation = !navigation"
+        ></v-btn>
       </template>
 
-      <v-app-bar-title>Api Manager</v-app-bar-title>
+      <v-toolbar-title>{{
+        !user ? "Api Manager" : `Welcome, ${user.displayName}`
+      }}</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -18,7 +27,7 @@
         prepend-icon="mdi-google"
         color="primary"
         variant="outlined"
-        class="mr-2"
+        class="mr-4"
         @click="signIn"
       >
         Sign in
@@ -31,9 +40,10 @@
             icon
             color="primary"
             variant="outlined"
-            class="mr-2"
+            class="mr-4"
+            size="small"
           >
-            <v-avatar color="primary">
+            <v-avatar color="primary" size="small">
               <v-img
                 v-if="user.photoURL"
                 :src="user.photoURL"
@@ -71,7 +81,8 @@
         :icon="theme === 'dark' ? 'mdi-weather-night' : 'mdi-weather-sunny'"
         color="primary"
         variant="outlined"
-        class="mr-2"
+        class="mr-4"
+        size="small"
         @click="toggleTheme"
       ></v-btn>
     </v-app-bar>
@@ -85,6 +96,10 @@ const { signIn, signOut } = useAuth();
 const { user, updateUser } = useUser();
 const theme = useTheme();
 const cookieTheme = useCookie("theme");
+const navigation = useNavigation();
+const route = useRoute();
+
+const isWorkspaceRoute = computed(() => !!route.params.workspaceSlug);
 
 function toggleTheme() {
   theme.value = theme.value === "dark" ? "light" : "dark";

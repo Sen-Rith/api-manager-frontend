@@ -2,10 +2,6 @@ import { FirebaseOptions, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 export default defineNuxtPlugin(async () => {
-  const { user } = useUser();
-  const theme = useTheme();
-  const cookieTheme = useCookie("theme");
-
   const config = useRuntimeConfig();
 
   const firebaseConfig: FirebaseOptions = {
@@ -24,22 +20,11 @@ export default defineNuxtPlugin(async () => {
 
   auth.onIdTokenChanged(async (firebaseUser) => {
     const session = useCookie("session");
-
-    if (!firebaseUser && !!user.value) {
-      user.value = null;
-      session.value = null;
-      return reloadNuxtApp({ path: "/", force: true });
-    }
-
-    if (
-      (firebaseUser && !user.value) ||
-      (firebaseUser && user.value && firebaseUser.email !== user.value.email)
-    ) {
+    if (firebaseUser) {
       session.value = await firebaseUser.getIdToken();
-      return reloadNuxtApp({ path: "/", force: true });
+    } else {
+      session.value = null;
     }
-
-    if (firebaseUser) session.value = await firebaseUser.getIdToken();
   });
 
   return {

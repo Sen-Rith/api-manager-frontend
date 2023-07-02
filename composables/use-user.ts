@@ -14,26 +14,27 @@ export default function () {
   const { $apolloClient } = useNuxtApp();
   const theme = useTheme();
 
-  const user = useState<User | null>("user", () => null);
+  const user = useState<User | undefined>("user", () => undefined);
 
-  const userUpdateSubscription = useState<
-    SubscriptionCurrentObservable["subscription"] | null
-  >("userUpdateSubscription", () => null);
-
-  const onUserUpdate = $apolloClient.subscribe<SubscribeToUserSubscription>({
-    query: SUBSCRIBE_TO_USER,
-  });
+  const userSubscription = useState<
+    SubscriptionCurrentObservable["subscription"] | undefined
+  >("userSubscription", () => undefined);
 
   async function getUser() {
-    const { data } = await $apolloClient.query<UserQuery>({
+    const { data, errors } = await $apolloClient.query<UserQuery>({
       query: GET_USER,
     });
-    if (!data.user) return;
+    if (errors) {
+      throw createError({
+        statusCode: (errors[0].extensions.status as number) ?? 500,
+        statusMessage: errors[0].message,
+      });
+    }
     user.value = data.user;
   }
 
   async function updateUser(updatedUser: User) {
-    const { data } = await $apolloClient.mutate<
+    const { data, errors } = await $apolloClient.mutate<
       UpdateUserMutation,
       UpdateUserMutationVariables
     >({
@@ -45,12 +46,20 @@ export default function () {
         },
       },
     });
-    if (!data) return;
+    if (!data || errors) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Failed to update user",
+      });
+    }
     user.value = data.updateUser;
   }
 
-  function subscribeToUserUpdated() {
-    userUpdateSubscription.value = onUserUpdate.subscribe(({ data }) => {
+  function subscribeToUser() {
+    const subscription = $apolloClient.subscribe<SubscribeToUserSubscription>({
+      query: SUBSCRIBE_TO_USER,
+    });
+    userSubscription.value = subscription.subscribe(({ data }) => {
       if (!data) return;
       if (user.value?.theme !== data.subscribeToUser.user.theme) {
         const cookieTheme = useCookie("theme");
@@ -61,16 +70,16 @@ export default function () {
     });
   }
 
-  function unSubscribeToUserUpdated() {
-    userUpdateSubscription.value?.unsubscribe();
-    userUpdateSubscription.value = null;
+  function unSubscribeToUser() {
+    userSubscription.value?.unsubscribe();
+    userSubscription.value = undefined;
   }
 
   return {
     user,
     getUser,
     updateUser,
-    subscribeToUserUpdated,
-    unSubscribeToUserUpdated,
+    subscribeToUser,
+    unSubscribeToUser,
   };
 }

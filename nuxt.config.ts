@@ -4,6 +4,7 @@ import vuetify from "vite-plugin-vuetify";
 export default defineNuxtConfig({
   app: {
     head: {
+      title: "Api Manager",
       link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.png" }],
     },
   },

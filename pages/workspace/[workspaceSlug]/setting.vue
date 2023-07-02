@@ -2,7 +2,7 @@
   <div class="d-flex justify-center align-center h-100">
     <v-card class="mx-2 pa-2" width="600" variant="outlined">
       <v-card-item>
-        <v-card-title>Create a Workspace</v-card-title>
+        <v-card-title>Update Workspace</v-card-title>
       </v-card-item>
 
       <v-form v-model="isFormValid" @submit.prevent="onSubmit">
@@ -63,35 +63,77 @@
           </v-row>
         </v-card-text>
 
-        <v-card-actions class="justify-end">
-          <v-row>
-            <v-col v-if="!hasNoWorkspace">
-              <v-btn variant="text" block @click="onCancel"> Cancel </v-btn>
-            </v-col>
-            <v-col>
-              <v-btn
-                color="primary"
-                variant="outlined"
-                block
-                :disabled="!isFormValid || isCheckingSlug || isCreating"
-                :loading="isCreating"
-                type="submit"
-              >
-                Create
+        <div class="pa-6">
+          <v-btn
+            color="primary"
+            variant="outlined"
+            block
+            :disabled="!isFormValid || isCheckingSlug || isUpdating"
+            :loading="isUpdating"
+            type="submit"
+          >
+            Update
+          </v-btn>
+
+          <v-divider class="my-6" />
+
+          <v-dialog v-model="deleteDialog" width="auto">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" color="error" variant="outlined" block>
+                Delete
               </v-btn>
-            </v-col>
-          </v-row>
-        </v-card-actions>
+            </template>
+
+            <v-card title="Delete Workspace">
+              <v-card-text
+                >Are you sure you want to delete workspace
+                <b class="text-primary">{{ workspace?.name }}</b
+                >?</v-card-text
+              >
+              <v-card-actions class="justify-end">
+                <v-btn
+                  variant="text"
+                  @click="deleteDialog = false"
+                  :disabled="isDeleting"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn
+                  color="error"
+                  variant="outlined"
+                  @click="onDelete"
+                  :disabled="isDeleting"
+                  :loading="isDeleting"
+                >
+                  Delete
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
       </v-form>
     </v-card>
   </div>
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: ["workspace"],
+});
+
 const config = useRuntimeConfig();
 const { workspaceList, getWorkspaceList } = useWorkspaceList();
-const { workspace, isWorkspaceSlugAvailable, createWorkspace } = useWorkspace();
+const {
+  workspace,
+  isWorkspaceSlugAvailable,
+  updateWorkspace,
+  removeWorkspace,
+} = useWorkspace();
 const { $lodash } = useNuxtApp();
+
+if (!workspace.value) {
+  throw createError({ statusCode: 404, statusMessage: "Workspace not found" });
+}
 
 const currentWorkspaceList = await getWorkspaceList();
 workspaceList.value = currentWorkspaceList;
@@ -101,18 +143,16 @@ const rules = {
   isSlugAvailable: () => isSlugAvailable.value || "This slug is not available",
 };
 
-const name = ref("");
-const slug = ref("");
-const color = ref("#7352b5");
-const icon = ref("mdi-account-group-outline");
+const name = ref(workspace.value.name);
+const slug = ref(workspace.value.slug);
+const color = ref(workspace.value.color);
+const icon = ref(workspace.value.icon);
 const isFormValid = ref(false);
-const isCreating = ref(false);
+const isUpdating = ref(false);
+const isDeleting = ref(false);
 const isCheckingSlug = ref(false);
 const isSlugAvailable = ref(true);
-
-const hasNoWorkspace = computed(() => {
-  return workspaceList.value?.workspaces.length === 0;
-});
+const deleteDialog = ref(false);
 
 const onSlugChange = $lodash.debounce(async (value: string) => {
   isCheckingSlug.value = true;
@@ -134,19 +174,27 @@ function onNameChange() {
   onSlugChange(slug.value);
 }
 
-async function onCancel() {
-  await navigateTo("/");
-}
-
 async function onSubmit() {
-  isCreating.value = true;
-  const newWorkspace = await createWorkspace({
+  if (!workspace.value) return;
+  isUpdating.value = true;
+  const updatedWorkspace = await updateWorkspace({
+    id: workspace.value.id,
     name: name.value,
     slug: slug.value,
     color: color.value,
     icon: icon.value,
   });
-  workspace.value = newWorkspace;
-  await navigateTo(`/workspace/${workspace.value.slug}`);
+  if (workspace.value.slug !== updatedWorkspace.slug) {
+    return await navigateTo(`/workspace/${updatedWorkspace.slug}/setting`);
+  }
+  workspace.value = updatedWorkspace;
+  isUpdating.value = false;
+}
+
+async function onDelete() {
+  if (!workspace.value) return;
+  isDeleting.value = true;
+  await removeWorkspace(workspace.value.id);
+  await navigateTo(`/workspace`);
 }
 </script>

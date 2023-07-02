@@ -1,4 +1,8 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client/core";
+import {
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+} from "@apollo/client/core";
 import { setContext } from "@apollo/client/link/context";
 
 export default defineNuxtPlugin(() => {
@@ -21,6 +25,16 @@ export default defineNuxtPlugin(() => {
   const apolloClient = new ApolloClient({
     link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: "no-cache",
+        errorPolicy: "ignore",
+      },
+      query: {
+        fetchPolicy: "no-cache",
+        errorPolicy: "all",
+      },
+    },
   });
 
   return {
